@@ -97,7 +97,7 @@ class PerlindunganDataTest extends TestCase
         $jadwal = $this->jadwal($dokter);
 
         $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'hari' => 'Rabu', 'jam_mulai' => '13:00', 'jam_selesai' => '15:00',
+            'hari' => 'Rabu', 'jam_mulai' => '13:00', 'jam_selesai' => '15:00', 'status' => 1,
         ])->assertSessionHasNoErrors()->assertRedirect(route('jadwal-periksa.index'));
 
         $jadwal->refresh();
@@ -113,9 +113,9 @@ class PerlindunganDataTest extends TestCase
         $this->pendaftar($jadwal);
 
         foreach ([
-            ['hari' => 'Selasa', 'jam_mulai' => '08:00', 'jam_selesai' => '10:00'],
-            ['hari' => 'Senin', 'jam_mulai' => '09:00', 'jam_selesai' => '10:00'],
-            ['hari' => 'Senin', 'jam_mulai' => '08:00', 'jam_selesai' => '11:00'],
+            ['hari' => 'Selasa', 'jam_mulai' => '08:00', 'jam_selesai' => '10:00', 'status' => 1],
+            ['hari' => 'Senin', 'jam_mulai' => '09:00', 'jam_selesai' => '10:00', 'status' => 1],
+            ['hari' => 'Senin', 'jam_mulai' => '08:00', 'jam_selesai' => '11:00', 'status' => 1],
         ] as $data) {
             $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$jadwal->id}", $data)->assertSessionHasErrors('hari');
         }
@@ -132,7 +132,7 @@ class PerlindunganDataTest extends TestCase
 
         // Form edit mengirim ulang nilai yang sama (format H:i:s dari database).
         $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'hari' => 'Senin', 'jam_mulai' => '08:00:00', 'jam_selesai' => '10:00:00',
+            'hari' => 'Senin', 'jam_mulai' => '08:00:00', 'jam_selesai' => '10:00:00', 'status' => 1,
         ])->assertSessionHasNoErrors()->assertRedirect(route('jadwal-periksa.index'));
     }
 
