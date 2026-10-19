@@ -21,6 +21,13 @@
     </div>
     @endif
 
+    @if (session('error'))
+    <div class="alert alert-error mb-4 rounded-xl shadow-sm" role="alert">
+        <i class="fas fa-circle-exclamation"></i>
+        <span>{{ session('error') }}</span>
+    </div>
+    @endif
+
     {{-- Card --}}
     <div class="card bg-base-100 shadow-md rounded-2 border">
         <div class="card-body p-0">
