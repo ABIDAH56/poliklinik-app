@@ -35,6 +35,7 @@
                             <th class="px-6 py-4">Hari</th>
                             <th class="px-6 py-4">Jam Mulai</th>
                             <th class="px-6 py-4">Jam Selesai</th>
+                            <th class="px-6 py-4">Status</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -58,6 +59,14 @@
 
                             <td class="px-6 py-4 text-slate-500">
                                 {{ \Carbon\Carbon::parse($jadwalPeriksa->jam_selesai)->format('H:i') }}
+                            </td>
+
+                            <td class="px-6 py-4">
+                                @if ($jadwalPeriksa->status)
+                                <span class="badge badge-success text-white">Aktif</span>
+                                @else
+                                <span class="badge badge-ghost text-slate-500">Tidak Aktif</span>
+                                @endif
                             </td>
 
                             <td class="px-6 py-4 text-right">
@@ -88,7 +97,7 @@
                         </tr>
                         @empty
 <tr>
-    <td colspan="5" class="text-center py-14 text-slate-400">
+    <td colspan="6" class="text-center py-14 text-slate-400">
         <div class="flex flex-col items-center justify-center gap-2">
             <i class="fas fa-inbox text-3xl"></i>
             <span>Belum ada Jadwal Periksa</span>

@@ -34,6 +34,7 @@ class JadwalPeriksaController extends Controller
             'hari' => $data['hari'],
             'jam_mulai' => $data['jam_mulai'],
             'jam_selesai' => $data['jam_selesai'],
+            'status' => $data['status'],
         ]);
 
         return redirect()->route('jadwal-periksa.index')
@@ -67,9 +68,8 @@ class JadwalPeriksaController extends Controller
                 ]);
             }
 
-            if ($berubah) {
-                $jadwalPeriksa->update($data);
-            }
+            // Status boleh diubah kapan saja, termasuk saat jadwal sudah memiliki pendaftar.
+            $jadwalPeriksa->update($data);
         });
 
         return redirect()->route('jadwal-periksa.index')
@@ -121,6 +121,7 @@ class JadwalPeriksaController extends Controller
             'hari' => ['required', Rule::in(self::HARI)],
             'jam_mulai' => ['required', 'date_format:H:i,H:i:s'],
             'jam_selesai' => ['required', 'date_format:H:i,H:i:s'],
+            'status' => ['required', 'boolean'],
         ]);
 
         $mulai = Carbon::parse($data['jam_mulai'])->format('H:i:s');
@@ -150,6 +151,6 @@ class JadwalPeriksaController extends Controller
             ]);
         }
 
-        return ['hari' => $data['hari'], 'jam_mulai' => $mulai, 'jam_selesai' => $selesai];
+        return ['hari' => $data['hari'], 'jam_mulai' => $mulai, 'jam_selesai' => $selesai, 'status' => (bool) $data['status']];
     }
 }

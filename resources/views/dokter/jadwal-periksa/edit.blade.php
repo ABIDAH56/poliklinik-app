@@ -87,6 +87,26 @@
                     @enderror
                 </div>
 
+                {{-- Status --}}
+                <div class="form-control mb-6">
+                    <label class="label pb-1">
+                        <span class="text-sm font-semibold text-gray-700">
+                            Status <span class="text-red-500">*</span>
+                        </span>
+                    </label>
+
+                    <select name="status" id="status"
+                        class="select select-bordered border-2 px-4 w-full rounded-lg text-sm @error('status') select-error @enderror"
+                        required>
+                        <option value="1" {{ (string) old('status', (int) $jadwalPeriksa->status) === '1' ? 'selected' : '' }}>Aktif</option>
+                        <option value="0" {{ (string) old('status', (int) $jadwalPeriksa->status) === '0' ? 'selected' : '' }}>Tidak Aktif</option>
+                    </select>
+
+                    @error('status')
+                    <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 {{-- Buttons --}}
                 <div class="flex gap-3">
                     <button type="submit" class="btn bg-[#2d4499] hover:bg-[#1e2d6b]

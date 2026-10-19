@@ -13,6 +13,11 @@ class JadwalPeriksa extends Model
         'hari',
         'jam_mulai',
         'jam_selesai',
+        'status',
+    ];
+
+    protected $casts = [
+        'status' => 'boolean',
     ];
 
     // Urutan hari yang didukung aplikasi (sama dengan enum kolom hari).
