@@ -45,7 +45,7 @@ public function register(Request $request)
         'no_ktp' => 'required|numeric|unique:users,no_ktp',
         'no_hp' => 'required|numeric',
         'email' => 'required|email|unique:users,email',
-        'password' => 'required|min:6'
+        'password' => 'required|min:6|confirmed'
     ]);
 
     User::buatPasien([
