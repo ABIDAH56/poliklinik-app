@@ -49,7 +49,7 @@ class HapusAkunDanNoRmTest extends TestCase
 
         return $extra + [
             'nama' => 'Pasien Uji', 'alamat' => 'Jl. Uji', 'no_ktp' => (string) $n . random_int(100, 999),
-            'no_hp' => '0812' . $n, 'email' => "p{$n}@test.local", 'password' => 'rahasia123',
+            'no_hp' => '0812' . $n, 'email' => "p{$n}@test.local", 'password' => 'rahasia123', 'password_confirmation' => 'rahasia123',
         ];
     }
 
