@@ -30,10 +30,11 @@ class JadwalPeriksa extends Model
         return $query->orderByRaw("FIELD(hari, {$daftar})")->orderBy('jam_mulai');
     }
 
-    // Jadwal yang bisa didaftarkan pasien: dokternya ada dan sudah ditugaskan ke sebuah poli.
+    // Jadwal yang bisa didaftarkan pasien: berstatus aktif, dokternya ada dan sudah ditugaskan ke sebuah poli.
     public function scopeTersedia($query)
     {
-        return $query->whereHas('dokter', fn ($q) => $q->where('role', 'dokter')->whereNotNull('id_poli'))
+        return $query->where('status', true)
+            ->whereHas('dokter', fn ($q) => $q->where('role', 'dokter')->whereNotNull('id_poli'))
             ->urutHari();
     }
 
