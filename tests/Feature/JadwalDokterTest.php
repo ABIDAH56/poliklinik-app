@@ -38,7 +38,7 @@ class JadwalDokterTest extends TestCase
 
     private function simpan(User $dokter, array $data)
     {
-        return $this->actingAs($dokter)->post('/dokter/jadwal-periksa', $data);
+        return $this->actingAs($dokter)->post('/dokter/jadwal-periksa', $data + ['status' => 1]);
     }
 
     // ---------- Hak akses ----------
@@ -49,11 +49,11 @@ class JadwalDokterTest extends TestCase
         $penyusup = $this->dokter();
         $jadwal = $this->jadwal($pemilik);
 
-        $this->actingAs($penyusup)->get("/dokter/jadwal-periksa/{$jadwal->id}/edit")->assertNotFound();
+        $this->actingAs($penyusup)->get("/dokter/jadwal-periksa/{$jadwal->id}/edit")->assertForbidden();
         $this->actingAs($penyusup)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'hari' => 'Selasa', 'jam_mulai' => '09:00', 'jam_selesai' => '11:00',
-        ])->assertNotFound();
-        $this->actingAs($penyusup)->delete("/dokter/jadwal-periksa/{$jadwal->id}")->assertNotFound();
+            'hari' => 'Selasa', 'jam_mulai' => '09:00', 'jam_selesai' => '11:00', 'status' => 1,
+        ])->assertForbidden();
+        $this->actingAs($penyusup)->delete("/dokter/jadwal-periksa/{$jadwal->id}")->assertForbidden();
 
         $jadwal->refresh();
         $this->assertSame('Senin', $jadwal->hari);
@@ -90,7 +90,7 @@ class JadwalDokterTest extends TestCase
         $jadwal = $this->jadwal($saya);
 
         $this->actingAs($saya)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'id_dokter' => $lain->id, 'hari' => 'Selasa', 'jam_mulai' => '09:00', 'jam_selesai' => '11:00',
+            'id_dokter' => $lain->id, 'hari' => 'Selasa', 'jam_mulai' => '09:00', 'jam_selesai' => '11:00', 'status' => 1,
         ])->assertSessionHasNoErrors();
 
         $this->assertSame($saya->id, $jadwal->fresh()->id_dokter);
@@ -174,10 +174,10 @@ class JadwalDokterTest extends TestCase
 
         // Menyimpan ulang rentang yang sama / sebagian tumpang tindih dengan dirinya sendiri harus lolos.
         $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'hari' => 'Senin', 'jam_mulai' => '08:00', 'jam_selesai' => '10:00',
+            'hari' => 'Senin', 'jam_mulai' => '08:00', 'jam_selesai' => '10:00', 'status' => 1,
         ])->assertSessionHasNoErrors();
         $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'hari' => 'Senin', 'jam_mulai' => '08:30:00', 'jam_selesai' => '11:00:00',
+            'hari' => 'Senin', 'jam_mulai' => '08:30:00', 'jam_selesai' => '11:00:00', 'status' => 1,
         ])->assertRedirect(route('jadwal-periksa.index'))->assertSessionHasNoErrors();
 
         $jadwal->refresh();
@@ -192,7 +192,7 @@ class JadwalDokterTest extends TestCase
         $b = $this->jadwal($dokter, 'Senin', '10:00', '12:00');
 
         $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$b->id}", [
-            'hari' => 'Senin', 'jam_mulai' => '09:00', 'jam_selesai' => '12:00',
+            'hari' => 'Senin', 'jam_mulai' => '09:00', 'jam_selesai' => '12:00', 'status' => 1,
         ])->assertSessionHasErrors('jam_mulai');
 
         $this->assertSame('10:00:00', $b->fresh()->jam_mulai);
@@ -205,7 +205,7 @@ class JadwalDokterTest extends TestCase
         $jadwal = $this->jadwal($dokter);
 
         $this->actingAs($dokter)->put("/dokter/jadwal-periksa/{$jadwal->id}", [
-            'hari' => 'Senin', 'jam_mulai' => '12:00', 'jam_selesai' => '11:00',
+            'hari' => 'Senin', 'jam_mulai' => '12:00', 'jam_selesai' => '11:00', 'status' => 1,
         ])->assertSessionHasErrors('jam_selesai');
 
         $this->assertSame('08:00:00', $jadwal->fresh()->jam_mulai);

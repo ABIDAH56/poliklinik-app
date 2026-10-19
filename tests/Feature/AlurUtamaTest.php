@@ -81,10 +81,10 @@ class AlurUtamaTest extends TestCase
 
         // ---------- Dokter: login + buat jadwal ----------
         $this->masuk('dokter@alur.test');
-        $this->post('/dokter/jadwal-periksa', ['hari' => 'Senin', 'jam_mulai' => '08:00', 'jam_selesai' => '12:00'])
+        $this->post('/dokter/jadwal-periksa', ['hari' => 'Senin', 'jam_mulai' => '08:00', 'jam_selesai' => '12:00', 'status' => 1])
             ->assertSessionHasNoErrors()->assertSessionHas('type', 'success');
         $jadwal = JadwalPeriksa::where('id_dokter', $dokter->id)->firstOrFail();
-        $this->post('/dokter/jadwal-periksa', ['hari' => 'Senin', 'jam_mulai' => '11:00', 'jam_selesai' => '13:00'])
+        $this->post('/dokter/jadwal-periksa', ['hari' => 'Senin', 'jam_mulai' => '11:00', 'jam_selesai' => '13:00', 'status' => 1])
             ->assertSessionHasErrors('jam_mulai');                         // bentrok ditolak
         $this->keluar();
 
