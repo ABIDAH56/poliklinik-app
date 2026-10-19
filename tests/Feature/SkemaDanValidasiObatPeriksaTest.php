@@ -100,9 +100,9 @@ class SkemaDanValidasiObatPeriksaTest extends TestCase
         $this->actingAs($dokter)->get("/dokter/riwayat-pasien/{$periksa->id}")->assertOk()->assertSee('Tidak ada catatan');
     }
 
-    // ---------- 2. Kemasan obat opsional ----------
+    // ---------- 2. Kemasan obat wajib diisi ----------
 
-    public function test_kemasan_boleh_kosong_saat_membuat_obat(): void
+    public function test_kemasan_wajib_diisi_saat_membuat_obat(): void
     {
         foreach ([['kemasan' => ''], ['kemasan' => '   '], []] as $i => $variasi) {
             $nama = "Obat Tanpa Kemasan {$i}";
@@ -110,20 +110,20 @@ class SkemaDanValidasiObatPeriksaTest extends TestCase
             unset($data['kemasan']);
 
             $this->actingAs($this->admin)->post('/admin/obat', $variasi + $data)
-                ->assertSessionHasNoErrors()->assertSessionHas('type', 'success');
+                ->assertSessionHasErrors('kemasan');
 
-            $this->assertNull(Obat::where('nama_obat', $nama)->firstOrFail()->kemasan);
+            $this->assertSame(0, Obat::where('nama_obat', $nama)->count());
         }
     }
 
-    public function test_kemasan_boleh_dikosongkan_saat_mengedit_obat(): void
+    public function test_kemasan_tidak_boleh_dikosongkan_saat_mengedit_obat(): void
     {
         $obat = Obat::create($this->dataObat(['kemasan' => 'botol']));
 
         $this->actingAs($this->admin)->put("/admin/obat/{$obat->id}", $this->dataObat(['kemasan' => '']))
-            ->assertSessionHasNoErrors()->assertSessionHas('type', 'success');
+            ->assertSessionHasErrors('kemasan');
 
-        $this->assertNull($obat->fresh()->kemasan);
+        $this->assertSame('botol', $obat->fresh()->kemasan);
         $this->actingAs($this->admin)->get('/admin/obat')->assertOk();
         $this->actingAs($this->admin)->get("/admin/obat/{$obat->id}/edit")->assertOk();
     }

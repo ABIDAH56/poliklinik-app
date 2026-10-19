@@ -57,10 +57,10 @@ class AlurUtamaTest extends TestCase
         $this->assertSame('dokter', $dokter->role);
         $this->assertSame($poli->id, $dokter->id_poli);
 
-        $this->post('/admin/obat', ['nama_obat' => 'Amoxicillin', 'kemasan' => '', 'harga' => 20000, 'stok' => 5])
+        $this->post('/admin/obat', ['nama_obat' => 'Amoxicillin', 'kemasan' => 'strip', 'harga' => 20000, 'stok' => 5])
             ->assertSessionHas('type', 'success');
         $obat = Obat::where('nama_obat', 'Amoxicillin')->firstOrFail();
-        $this->assertNull($obat->kemasan);
+        $this->assertSame('strip', $obat->kemasan);
 
         $this->post('/admin/obat/' . $obat->id . '/tambah-stok', ['jumlah' => 3])->assertSessionHas('type', 'success');
         $this->post('/admin/obat/' . $obat->id . '/kurangi-stok', ['jumlah' => 1])->assertSessionHas('type', 'success');
