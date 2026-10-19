@@ -17,24 +17,33 @@
                     <label class="label pt-0 pb-1.5"><span class="text-[0.85rem] font-medium text-slate-700">Nama Lengkap</span></label>
                     <label class="input flex items-center gap-3 rounded-[12px] border-none bg-[#f8fafc] h-[45px] px-4">
                         <i class="fas fa-user text-slate-400 text-[0.85rem]"></i>
-                        <input type="text" name="nama" placeholder="Masukkan nama lengkap..." class="grow bg-transparent text-slate-700 text-[0.88rem] focus:outline-none" required>
+                        <input type="text" name="nama" value="{{ old('nama') }}" placeholder="Masukkan nama lengkap..." class="grow bg-transparent text-slate-700 text-[0.88rem] focus:outline-none" required>
                     </label>
+                    @error('nama')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="form-control mb-4">
                     <label class="label pt-0 pb-1.5"><span class="text-[0.85rem] font-medium text-slate-700">Email</span></label>
                     <label class="input flex items-center gap-3 rounded-[12px] border-none bg-[#f8fafc] h-[45px] px-4">
                         <i class="fas fa-envelope text-slate-400 text-[0.85rem]"></i>
-                        <input type="email" name="email" placeholder="Masukkan email..." class="grow bg-transparent text-slate-700 text-[0.88rem] focus:outline-none" required>
+                        <input type="email" name="email" value="{{ old('email') }}" placeholder="Masukkan email..." class="grow bg-transparent text-slate-700 text-[0.88rem] focus:outline-none" required>
                     </label>
+                    @error('email')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="form-control mb-4">
                     <label class="label pt-0 pb-1.5"><span class="text-[0.85rem] font-medium text-slate-700">Alamat</span></label>
                     <label class="input flex items-center gap-3 rounded-[12px] border-none bg-[#f8fafc] h-[45px] px-4">
                         <i class="fas fa-map-marker-alt text-slate-400 text-[0.85rem]"></i>
-                        <input type="text" name="alamat" placeholder="Masukkan alamat..." class="grow bg-transparent text-slate-700 text-[0.88rem] focus:outline-none" required>
+                        <input type="text" name="alamat" value="{{ old('alamat') }}" placeholder="Masukkan alamat..." class="grow bg-transparent text-slate-700 text-[0.88rem] focus:outline-none" required>
                     </label>
+                    @error('alamat')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="grid grid-cols-2 gap-4 mb-4">
@@ -42,15 +51,21 @@
                         <label class="label pt-0 pb-1.5"><span class="text-[0.85rem] font-medium text-slate-700">No. HP</span></label>
                         <label class="input flex items-center gap-3 rounded-[12px] border-none bg-[#f8fafc] h-[45px] px-4">
                             <i class="fas fa-phone text-slate-400 text-[0.8rem]"></i>
-                            <input type="number" name="no_hp" placeholder="No. HP..." class="grow bg-transparent text-slate-700 text-[0.85rem] focus:outline-none" required>
+                            <input type="number" name="no_hp" value="{{ old('no_hp') }}" placeholder="No. HP..." class="grow bg-transparent text-slate-700 text-[0.85rem] focus:outline-none" required>
                         </label>
+                        @error('no_hp')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                     <div class="form-control">
                         <label class="label pt-0 pb-1.5"><span class="text-[0.85rem] font-medium text-slate-700">No. KTP</span></label>
                         <label class="input flex items-center gap-3 rounded-[12px] border-none bg-[#f8fafc] h-[45px] px-4">
                             <i class="fas fa-address-card text-slate-400 text-[0.8rem]"></i>
-                            <input type="number" name="no_ktp" placeholder="No. KTP..." class="grow bg-transparent text-slate-700 text-[0.85rem] focus:outline-none" required>
+                            <input type="number" name="no_ktp" value="{{ old('no_ktp') }}" placeholder="No. KTP..." class="grow bg-transparent text-slate-700 text-[0.85rem] focus:outline-none" required>
                         </label>
+                        @error('no_ktp')
+                        <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                        @enderror
                     </div>
                 </div>
 
@@ -61,6 +76,9 @@
                         <input type="password" name="password" id="password_reg" placeholder="Password..." class="grow bg-transparent text-slate-700 text-[0.85rem] focus:outline-none" required>
                         <i class="fas fa-eye text-slate-400 text-[0.8rem] cursor-pointer" onclick="togglePassword('password_reg', 'toggle_reg')"></i>
                     </label>
+                    @error('password')
+                    <p class="text-xs text-red-500 mt-1">{{ $message }}</p>
+                    @enderror
                 </div>
 
                 <div class="form-control mb-8">
