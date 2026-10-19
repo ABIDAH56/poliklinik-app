@@ -73,7 +73,7 @@ class AlurUtamaTest extends TestCase
         // ---------- Pasien: registrasi + no_rm + login ----------
         $this->post('/register', [
             'nama' => 'Budi', 'alamat' => 'Jl. Melati 2', 'no_ktp' => '3201010101010002', 'no_hp' => '081200000002',
-            'email' => 'pasien@alur.test', 'password' => self::PASSWORD,
+            'email' => 'pasien@alur.test', 'password' => self::PASSWORD, 'password_confirmation' => self::PASSWORD,
         ])->assertRedirect(route('login'))->assertSessionHasNoErrors();
         $pasien = User::where('email', 'pasien@alur.test')->firstOrFail();
         $this->assertSame('pasien', $pasien->role);
