@@ -4,7 +4,7 @@
 
             {{-- Logo & Title --}}
             <div class="text-center mb-6">
-                <img src="{{ asset('images/logo-bengkot.png') }}"
+                <img src="{{ asset('image/logo-bengkot.png') }}"
                     class="w-[65px] h-[65px] mx-auto mb-4 block">
                 <h1 class="text-[1.6rem] font-bold text-[#1e2d6b] mb-1">Poliklinik</h1>
                 <p class="text-[0.85rem] text-slate-400">Buat akun baru</p>
