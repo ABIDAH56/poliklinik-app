@@ -16,6 +16,9 @@ use Tests\TestCase;
  */
 class UniqueNoRmMigrationTest extends TestCase
 {
+    // Migration yang diuji dirollback secara spesifik, supaya tes tidak bergantung pada urutan migration terbaru.
+    private const MIGRATION_UNIQUE = 'database/migrations/2026_10_17_000000_add_unique_no_rm_to_users_table.php';
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -71,8 +74,8 @@ class UniqueNoRmMigrationTest extends TestCase
 
     public function test_migration_berhenti_jika_ada_no_rm_kembar_dan_tidak_mengubah_data(): void
     {
-        // Lepas constraint (rollback migration terakhir), buat data kembar, lalu coba pasang lagi.
-        $this->assertSame(0, Artisan::call('migrate:rollback', ['--database' => 'sqlite_mem', '--step' => 1, '--force' => true]));
+        // Lepas constraint (rollback migration unique no_rm saja, bukan migration terbaru), buat data kembar, lalu coba pasang lagi.
+        $this->assertSame(0, Artisan::call('migrate:rollback', ['--database' => 'sqlite_mem', '--path' => self::MIGRATION_UNIQUE, '--force' => true]));
         $this->pasien('202610-020');
         $this->pasien('202610-020');
 
@@ -91,7 +94,7 @@ class UniqueNoRmMigrationTest extends TestCase
     {
         $id = $this->pasien('202610-030');
 
-        $this->assertSame(0, Artisan::call('migrate:rollback', ['--database' => 'sqlite_mem', '--step' => 1, '--force' => true]));
+        $this->assertSame(0, Artisan::call('migrate:rollback', ['--database' => 'sqlite_mem', '--path' => self::MIGRATION_UNIQUE, '--force' => true]));
         $this->assertSame(0, Artisan::call('migrate', ['--database' => 'sqlite_mem', '--force' => true]));
 
         $this->assertSame('202610-030', DB::table('users')->where('id', $id)->value('no_rm'));
