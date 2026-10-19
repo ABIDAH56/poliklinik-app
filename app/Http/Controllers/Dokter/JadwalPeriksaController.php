@@ -47,7 +47,7 @@ class JadwalPeriksaController extends Controller
     }
 
     public function update(Request $request, string $id){
-        // Ownership dicek lebih dulu (404 untuk jadwal dokter lain), lalu isian divalidasi.
+        // Ownership dicek lebih dulu (403 untuk jadwal dokter lain), lalu isian divalidasi.
         $this->jadwalMilikSaya($id);
         $data = $this->validasi($request, (int) $id);
 
@@ -102,10 +102,12 @@ class JadwalPeriksaController extends Controller
             ->with('type', 'success');
     }
 
-    // Hanya jadwal milik dokter yang login; jadwal dokter lain dijawab 404.
+    // Hanya jadwal milik dokter yang login; jadwal dokter lain dijawab 403, id yang tidak ada 404.
     private function jadwalMilikSaya($id): JadwalPeriksa
     {
-        return JadwalPeriksa::where('id_dokter', Auth::id())->findOrFail($id);
+        $jadwalPeriksa = JadwalPeriksa::findOrFail($id);
+        abort_if((int) $jadwalPeriksa->id_dokter !== (int) Auth::id(), 403);
+        return $jadwalPeriksa;
     }
 
     /**
