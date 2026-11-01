@@ -43,8 +43,10 @@
                         @foreach ($obats as $obat)
                             <option value="{{ $obat->id }}"
                                 data-nama="{{ $obat->nama_obat }}"
-                                data-harga="{{ $obat->harga }}">
+                                data-harga="{{ $obat->harga }}"
+                                @disabled($obat->isStokHabis())>
                                 {{ $obat->nama_obat }} - Rp{{ number_format($obat->harga) }}
+                                ({{ $obat->isStokHabis() ? 'stok habis' : 'stok: ' . $obat->stok }})
                             </option>
                         @endforeach
                     </select>
