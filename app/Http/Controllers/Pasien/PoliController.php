@@ -18,10 +18,17 @@ class PoliController extends Controller
         $polis = Poli::all();
         $jadwal = JadwalPeriksa::tersedia()->with('dokter', 'dokter.poli')->get();
 
+        // Riwayat pendaftaran hanya milik pasien yang sedang login.
+        $riwayat = DaftarPoli::with(['jadwalPeriksa.dokter.poli', 'periksas'])
+            ->where('id_pasien', $user->id)
+            ->latest('id')
+            ->get();
+
         return view('pasien.daftar', [
             'user' => $user,
             'polis' => $polis,
             'jadwals' => $jadwal,
+            'riwayat' => $riwayat,
         ]);
     }
 

@@ -98,6 +98,53 @@
 
                 </div>
             </div>
+
+            {{-- Riwayat Pendaftaran --}}
+            <div class="card bg-base-100 shadow mt-6">
+                <div class="card-body p-0">
+                    <div class="px-6 py-4 border-b border-slate-200">
+                        <h3 class="font-bold text-slate-800">Riwayat Pendaftaran Saya</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="table table-zebra w-full">
+                            <thead class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">No</th>
+                                    <th class="px-6 py-4">Poli</th>
+                                    <th class="px-6 py-4">Dokter</th>
+                                    <th class="px-6 py-4">Jadwal</th>
+                                    <th class="px-6 py-4">No Antrian</th>
+                                    <th class="px-6 py-4">Keluhan</th>
+                                    <th class="px-6 py-4">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($riwayat as $item)
+                                <tr class="hover:bg-slate-50 transition">
+                                    <td class="px-6 py-4 text-slate-500">{{ $loop->iteration }}</td>
+                                    <td class="px-6 py-4">{{ optional($item->jadwalPeriksa->dokter->poli)->nama_poli ?? '-' }}</td>
+                                    <td class="px-6 py-4 font-semibold text-slate-800">{{ $item->jadwalPeriksa->dokter->nama ?? '-' }}</td>
+                                    <td class="px-6 py-4 text-slate-500">{{ $item->jadwalPeriksa->hari }}, {{ $item->jadwalPeriksa->jam_mulai }} - {{ $item->jadwalPeriksa->jam_selesai }}</td>
+                                    <td class="px-6 py-4 text-slate-500">{{ $item->no_antrian }}</td>
+                                    <td class="px-6 py-4 text-slate-500">{{ $item->keluhan ?: '-' }}</td>
+                                    <td class="px-6 py-4">
+                                        @if ($item->periksas->isNotEmpty())
+                                        <span class="badge bg-green-100 text-green-700 border border-green-200 rounded-lg px-3 py-1 text-xs font-semibold">Sudah Diperiksa</span>
+                                        @else
+                                        <span class="badge bg-amber-100 text-amber-700 border border-amber-200 rounded-lg px-3 py-1 text-xs font-semibold">Menunggu</span>
+                                        @endif
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="7" class="text-center py-10 text-slate-400">Belum ada pendaftaran</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
