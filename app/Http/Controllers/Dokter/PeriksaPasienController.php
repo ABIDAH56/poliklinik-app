@@ -115,6 +115,7 @@ class PeriksaPasienController extends Controller
                     DetailPeriksa::create([
                         'id_periksa' => $periksa->id,
                         'id_obat' => $obat->id,
+                        'harga' => $obat->harga, // harga saat pemeriksaan
                     ]);
                 }
             });

@@ -84,7 +84,7 @@
                             <tr class="hover:bg-slate-50 transition">
                                 <td class="px-6 py-4 text-slate-500">{{ $index + 1 }}</td>
                                 <td class="px-6 py-4 font-semibold text-slate-800">{{ $detail->obat->nama_obat }}</td>
-                                <td class="px-6 py-4 text-slate-500">Rp {{ number_format($detail->obat->harga, 0, ',',
+                                <td class="px-6 py-4 text-slate-500">Rp {{ number_format($detail->harga, 0, ',',
                                     '.') }}</td>
                             </tr>
                             @endforeach
