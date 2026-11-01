@@ -38,7 +38,7 @@
                     {{-- Head --}}
                     <thead class="bg-slate-100 text-slate-500 text-xs uppercase tracking-wider">
                         <tr>
-                            <th class="px-6 py-4">ID</th>
+                            <th class="px-6 py-4">No</th>
                             <th class="px-6 py-4">Hari</th>
                             <th class="px-6 py-4">Jam Mulai</th>
                             <th class="px-6 py-4">Jam Selesai</th>
@@ -53,7 +53,7 @@
                         <tr class="hover:bg-slate-50 transition">
 
                             <td class="px-6 py-4 text-slate-500">
-                                {{ $jadwalPeriksa->id }}
+                                {{ $loop->iteration }}
                             </td>
 
                             <td class="px-6 py-4 font-semibold text-slate-800">
