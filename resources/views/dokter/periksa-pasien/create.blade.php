@@ -20,6 +20,19 @@
                 @csrf
                 <input type="hidden" name="id_daftar_poli" value="{{ $id }}">
 
+                {{-- Tanggal Periksa --}}
+                <div class="form-control mb-5">
+                    <label class="label pb-1">
+                        <span class="text-sm font-semibold text-gray-700">Tanggal Periksa <span class="text-red-500">*</span></span>
+                    </label>
+                    <input type="datetime-local" name="tgl_periksa" value="{{ old('tgl_periksa', $tglDefault) }}"
+                        max="{{ $tglDefault }}"
+                        class="input input-bordered w-full rounded-lg border-2 px-4">
+                    @error('tgl_periksa')
+                    <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
+                    @enderror
+                </div>
+
                 {{-- Pilih Obat --}}
                 <div class="form-control mb-5">
                     <label class="label pb-1">

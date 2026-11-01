@@ -8,6 +8,7 @@ use App\Models\DaftarPoli;
 use App\Models\DetailPeriksa;
 use App\Models\Obat;
 use App\Models\Periksa;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -42,8 +43,9 @@ class PeriksaPasienController extends Controller
 
         $obats = Obat::all();
         $biayaPemeriksaan = self::BIAYA_PEMERIKSAAN;
+        $tglDefault = now()->setTimezone(config('app.display_timezone'))->format('Y-m-d\TH:i');
 
-        return view('dokter.periksa-pasien.create', compact('obats', 'id', 'biayaPemeriksaan'));
+        return view('dokter.periksa-pasien.create', compact('obats', 'id', 'biayaPemeriksaan', 'tglDefault'));
     }
 
     public function store(Request $request)
@@ -52,7 +54,17 @@ class PeriksaPasienController extends Controller
             'id_daftar_poli' => 'required|integer',
             'obat_json' => 'nullable|string',
             'catatan' => 'nullable|string',
+            'tgl_periksa' => 'nullable|date',
         ]);
+
+        // Input datetime-local berzona waktu tampilan (WIB); disimpan dalam zona waktu aplikasi.
+        $tglPeriksa = $request->filled('tgl_periksa')
+            ? Carbon::parse($request->tgl_periksa, config('app.display_timezone'))->setTimezone(config('app.timezone'))
+            : now();
+
+        if ($tglPeriksa->isFuture()) {
+            return $this->gagal('Tanggal periksa tidak boleh di masa depan.');
+        }
 
         // Daftar obat boleh kosong. Harga dan total tidak diambil dari browser.
         $obatIds = [];
@@ -74,7 +86,7 @@ class PeriksaPasienController extends Controller
         $antrean = $this->antreanMilikDokter($request->id_daftar_poli)->firstOrFail();
 
         try {
-            DB::transaction(function () use ($request, $antrean, $obatIds) {
+            DB::transaction(function () use ($request, $antrean, $obatIds, $tglPeriksa) {
                 // Kunci baris antrean: dua request bersamaan tidak bisa sama-sama lolos cek "sudah diperiksa".
                 $antrean = DaftarPoli::whereKey($antrean->id)->lockForUpdate()->firstOrFail();
                 if ($antrean->periksas()->exists()) {
@@ -93,7 +105,7 @@ class PeriksaPasienController extends Controller
 
                 $periksa = Periksa::create([
                     'id_daftar_poli' => $antrean->id,
-                    'tgl_periksa' => now(),
+                    'tgl_periksa' => $tglPeriksa,
                     'catatan' => $request->catatan,
                     'biaya_periksa' => $obats->sum('harga') + self::BIAYA_PEMERIKSAAN,
                 ]);
