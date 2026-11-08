@@ -69,7 +69,7 @@ class SkemaDanValidasiObatPeriksaTest extends TestCase
         $this->assertSame('varchar(255)', $namaObat['type']);
         $this->assertFalse($namaObat['nullable']);
         $this->assertSame('varchar(35)', $kemasan['type']);
-        $this->assertTrue($kemasan['nullable']);
+        $this->assertFalse($kemasan['nullable']); // diperketat: kemasan wajib (migration 2026_11_08)
         $this->assertSame('text', $catatan['type_name']);
         $this->assertTrue($catatan['nullable']);
         $this->assertSame('datetime', $tgl['type_name']);

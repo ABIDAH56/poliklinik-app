@@ -15,6 +15,15 @@ class Obat extends Model
         'stok',
     ];
 
+    protected $casts = [
+        'harga' => 'integer',
+        'stok'  => 'integer',
+    ];
+
+    /**
+     * Relasi one-to-many: satu obat bisa dipakai di banyak resep (tabel detail_periksa, kolom id_obat).
+     * Kebalikannya ada di DetailPeriksa::obat() (belongsTo).
+     */
     public function detailPeriksas()
     {
         return $this->hasMany(DetailPeriksa::class, 'id_obat');

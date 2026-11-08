@@ -9,7 +9,9 @@ use App\Models\Obat;
 use App\Models\Periksa;
 use App\Models\Poli;
 use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 // Berjalan pada database khusus pengujian (dijaga oleh Tests\TestCase), data di-rollback.
@@ -110,5 +112,50 @@ class HapusObatTest extends TestCase
         [, $detail] = $this->resepDengan($obat);
 
         $this->assertTrue($obat->detailPeriksas->contains($detail));
+    }
+
+    public function test_foreign_key_detail_periksa_menolak_hapus_obat_di_level_database(): void
+    {
+        $obat = $this->obat('Obat FK');
+        [, $detail] = $this->resepDengan($obat);
+
+        // Lewati pengecekan controller: database sendiri harus menolak (ON DELETE RESTRICT).
+        try {
+            $obat->delete();
+            $this->fail('Obat yang dipakai resep seharusnya tidak bisa dihapus di level database.');
+        } catch (QueryException $e) {
+            $this->assertSame('23000', $e->getCode());
+        }
+
+        $this->assertSame(1, DetailPeriksa::whereKey($detail->id)->count());
+    }
+
+    public function test_skema_obat_kemasan_wajib_dan_harga_tidak_negatif(): void
+    {
+        $kolom = collect(Schema::getColumns('obat'))->keyBy('name');
+
+        $this->assertFalse($kolom['kemasan']['nullable']);
+        $this->assertStringContainsString('unsigned', $kolom['harga']['type']);
+    }
+
+    public function test_halaman_detail_obat_menampilkan_data_dan_jumlah_pemakaian(): void
+    {
+        $obat = $this->obat('Obat Detail');
+        $this->resepDengan($obat);
+
+        $this->actingAs($this->admin)->get(route('obat.show', $obat->id))
+            ->assertOk()
+            ->assertSee('Obat Detail')
+            ->assertSee('1 kali')
+            ->assertSee('Pasien');
+    }
+
+    public function test_harga_negatif_ditolak_validasi(): void
+    {
+        $this->actingAs($this->admin)
+            ->post('/admin/obat', ['nama_obat' => 'Obat Minus', 'kemasan' => 'box', 'harga' => -1, 'stok' => 1])
+            ->assertSessionHasErrors('harga');
+
+        $this->assertSame(0, Obat::where('nama_obat', 'Obat Minus')->count());
     }
 }

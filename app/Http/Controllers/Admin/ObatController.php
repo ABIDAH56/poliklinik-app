@@ -3,16 +3,34 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ObatRequest;
 use App\Models\Obat;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ObatController extends Controller
 {
+    // READ: daftar semua obat + jumlah pemakaiannya di resep (detail_periksa)
     public function index()
     {
-        $obats = Obat::all();
+        $obats = Obat::withCount('detailPeriksas')->orderBy('nama_obat')->get();
         return view('admin.obat.index', compact('obats'));
+    }
+
+    // READ: detail satu obat beserta riwayat pemakaiannya
+    public function show(string $id)
+    {
+        $obat = Obat::withCount('detailPeriksas')->findOrFail($id);
+
+        // Eager load relasi detail_periksa -> periksa -> daftar_poli -> pasien (hindari N+1 query)
+        $pemakaian = $obat->detailPeriksas()
+            ->with('periksa.daftarPoli.pasien')
+            ->latest()
+            ->take(10)
+            ->get();
+
+        return view('admin.obat.show', compact('obat', 'pemakaian'));
     }
 
     public function create()
@@ -20,77 +38,63 @@ class ObatController extends Controller
         return view('admin.obat.create');
     }
 
-    public function store(Request $request)
+    // CREATE: validasi dilakukan otomatis oleh ObatRequest sebelum method ini dijalankan
+    public function store(ObatRequest $request)
     {
-        $request->validate([
-            'nama_obat' => 'required|string|max:255',
-            'kemasan'   => 'required|string|max:35',
-            'harga'     => 'required|integer|min:0',
-            'stok'      => 'required|integer|min:0',
-        ]);
-
-        Obat::create([
-            'nama_obat' => $request->nama_obat,
-            'kemasan'   => $request->kemasan,
-            'harga'     => $request->harga,
-            'stok'      => $request->stok,
-        ]);
+        Obat::create($request->validated());
 
         return redirect()->route('obat.index')
             ->with('message', 'Data Obat Berhasil dibuat')
             ->with('type', 'success');
     }
 
+    // UPDATE (form): data lama dikirim ke view agar input terisi
     public function edit(string $id)
     {
         $obat = Obat::findOrFail($id);
-        return view('admin.obat.edit')->with([
-            'obat' => $obat
-        ]);
+        return view('admin.obat.edit', compact('obat'));
     }
 
-    public function update(Request $request, string $id)
+    // UPDATE (simpan): aturan validasi sama dengan create (ObatRequest)
+    public function update(ObatRequest $request, string $id)
     {
-        $request->validate([
-            'nama_obat' => 'required|string|max:255',
-            'kemasan'   => 'required|string|max:35',
-            'harga'     => 'required|integer|min:0',
-            'stok'      => 'required|integer|min:0',
-        ]);
-
         $obat = Obat::findOrFail($id);
-        $obat->update([
-            'nama_obat' => $request->nama_obat,
-            'kemasan'   => $request->kemasan,
-            'harga'     => $request->harga,
-            'stok'      => $request->stok,
-        ]);
+        $obat->update($request->validated());
 
         return redirect()->route('obat.index')
             ->with('message', 'Data Obat berhasil di edit')
             ->with('type', 'success');
     }
 
+    // DELETE: obat yang sudah dipakai di resep (detail_periksa) tidak boleh dihapus
     public function destroy(string $id)
     {
         $obat = Obat::findOrFail($id);
+        $pesanDitolak = "Obat \"{$obat->nama_obat}\" tidak dapat dihapus karena sudah dipakai pada riwayat pemeriksaan. Kelola stoknya saja.";
 
-        // detail_periksa.id_obat memakai ON DELETE CASCADE: menghapus obat yang pernah diresepkan akan
-        // menghilangkan daftar obat pada riwayat pemeriksaan. Karena itu ditolak di server.
-        // Baris obat dikunci agar penyimpanan pemeriksaan yang berjalan bersamaan (yang juga mengunci
-        // baris obat) tidak bisa menyelinap di antara pengecekan dan penghapusan.
-        $dihapus = DB::transaction(function () use ($id) {
-            $terkunci = Obat::lockForUpdate()->findOrFail($id);
-            if ($terkunci->detailPeriksas()->exists()) {
-                return false;
+        try {
+            // Lapis 1 (aplikasi): cek relasi dulu. Baris obat dikunci agar penyimpanan pemeriksaan
+            // yang berjalan bersamaan tidak bisa menyelinap di antara pengecekan dan penghapusan.
+            $dihapus = DB::transaction(function () use ($id) {
+                $terkunci = Obat::lockForUpdate()->findOrFail($id);
+                if ($terkunci->detailPeriksas()->exists()) {
+                    return false;
+                }
+                $terkunci->delete();
+                return true;
+            });
+        } catch (QueryException $e) {
+            // Lapis 2 (database): FK detail_periksa.id_obat bersifat RESTRICT. Jika tetap terjadi
+            // pelanggaran foreign key (SQLSTATE 23000), tampilkan pesan jelas, bukan error mentah.
+            if ($e->getCode() !== '23000') {
+                throw $e;
             }
-            $terkunci->delete();
-            return true;
-        });
+            $dihapus = false;
+        }
 
         if (! $dihapus) {
             return redirect()->route('obat.index')
-                ->with('message', "Obat \"{$obat->nama_obat}\" tidak dapat dihapus karena sudah dipakai pada riwayat pemeriksaan. Kelola stoknya saja.")
+                ->with('message', $pesanDitolak)
                 ->with('type', 'error');
         }
 

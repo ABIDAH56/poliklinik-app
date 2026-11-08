@@ -34,6 +34,7 @@
                             <th class="px-6 py-4">Kemasan</th>
                             <th class="px-6 py-4">Harga</th>
                             <th class="px-6 py-4">Stok</th>
+                            <th class="px-6 py-4">Dipakai di Resep</th>
                             <th class="px-6 py-4 text-right">Aksi</th>
                         </tr>
                     </thead>
@@ -78,6 +79,11 @@
                                 @endif
                             </td>
 
+                            {{-- Jumlah pemakaian di detail_periksa (dari withCount di controller) --}}
+                            <td class="px-6 py-4 text-slate-500">
+                                {{ $obat->detail_periksas_count }} kali
+                            </td>
+
                             <td class="px-6 py-4 text-right">
                                 <div class="flex justify-end gap-2 flex-wrap">
 
@@ -99,6 +105,15 @@
                                         <i class="fas fa-minus text-xs"></i> Stok
                                     </button>
 
+                                    {{-- Detail --}}
+                                    <a href="{{ route('obat.show', $obat->id) }}"
+                                        class="inline-flex items-center gap-1 px-3 py-2
+                                               bg-slate-500 hover:bg-slate-600
+                                               text-white text-xs font-semibold
+                                               rounded-lg transition">
+                                        <i class="fas fa-eye text-xs"></i> Detail
+                                    </a>
+
                                     {{-- Edit --}}
                                     <a href="{{ route('obat.edit', $obat->id) }}"
                                         class="inline-flex items-center gap-1 px-3 py-2
@@ -108,7 +123,7 @@
                                         <i class="fas fa-pen text-xs"></i> Edit
                                     </a>
 
-                                    {{-- Delete --}}
+                                    {{-- Delete: konfirmasi di browser dulu; jika obat sudah dipakai, server menolak dengan pesan --}}
                                     <form action="{{ route('obat.destroy', $obat->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
@@ -264,7 +279,7 @@
 
                         @empty
                         <tr>
-                            <td colspan="5" class="text-center py-12 text-slate-400">
+                            <td colspan="6" class="text-center py-12 text-slate-400">
                                 <i class="fas fa-inbox text-3xl mb-3 block"></i>
                                 Belum ada data obat
                             </td>

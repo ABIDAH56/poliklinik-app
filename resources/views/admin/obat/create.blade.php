@@ -40,7 +40,7 @@
                     {{-- Kemasan --}}
                     <div>
                         <label class="block text-sm font-semibold text-slate-700 mb-1">
-                            Kemasan
+                            Kemasan <span class="text-red-500">*</span>
                         </label>
                         <input type="text" name="kemasan" value="{{ old('kemasan') }}" required
                             placeholder="Contoh: Strip, Botol, Tube..." class="w-full px-4 py-2 border-2 rounded-lg p-2
